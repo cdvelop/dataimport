@@ -2,8 +2,10 @@
 PLAN: "feat: dataimport messages for beginners, translatable with langc"
 EXECUTOR: jules
 REVIEWER: none
-STATUS: running
+STATUS: review
 SESSION: 1465302416378937098
+PR: https://github.com/cdvelop/dataimport/pull/2
+REVIEWED_COMMIT: 375a3064bff880a3eb89f1a9a88751b2136e6b31
 ---
 
 > Read AGENTS.md at the repo root before any change.
