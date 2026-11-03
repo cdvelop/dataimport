@@ -117,8 +117,8 @@ func TestValueUnknownColumnPanics(t *testing.T) {
 						if r == nil {
 							t.Fatal("expected panic")
 						}
-						if msg, ok := r.(string); !ok || msg != "dataimport: table legacy_widget has no column nope" {
-							t.Errorf("expected panic 'dataimport: table legacy_widget has no column nope', got %v", r)
+						if msg, ok := r.(string); !ok || msg != "dataimport: table legacy_widget has no column nope — check the column name in your step" {
+							t.Errorf("expected panic 'dataimport: table legacy_widget has no column nope — check the column name in your step', got %v", r)
 						}
 					}()
 
@@ -221,8 +221,8 @@ func TestNonTextValueRejected(t *testing.T) {
 	}
 
 	_, err := dataimport.Run(db, snap, nil, plan, []string{"widgets"}, dataimport.Apply)
-	if err == nil || err.Error() != "step widgets: dataimport: table legacy_widget column name: value is not text" {
-		t.Errorf("expected 'value is not text' error, got %v", err)
+	if err == nil || err.Error() != "step widgets: dataimport: table legacy_widget column name returned a value that is not text — the backup engine must return every value as text" {
+		t.Errorf("expected error, got %v", err)
 	}
 }
 

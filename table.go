@@ -1,9 +1,8 @@
 package dataimport
 
 import (
-	"errors"
-
 	"webtyp.com/ddl"
+	wfmt "webtyp.com/fmt"
 )
 
 // Table is one legacy table loaded from the snapshot, every value as text.
@@ -35,12 +34,12 @@ func (t *Table) index(col string) int {
 			return i
 		}
 	}
-	panic("dataimport: table " + t.Name + " has no column " + col)
+	panic(wfmt.Err("dataimport:", "table", t.Name, "has no", "column", col, "— check the column name in your step").Error())
 }
 
 func (t *Table) set(r Row, col, value string) { r.values[t.index(col)] = cell{text: value, null: false} }
 
-var ErrTableNotDeclared = errors.New("dataimport: table not declared in Plan.Tables")
+var ErrTableNotDeclared = wfmt.Err("dataimport:", "the step reads a table that is not listed in Plan.Tables — add it there with its", "id column")
 
 // loadTable reads every row of name from snap.
 func loadTable(snap ddl.Snapshot, name, idColumn string) (*Table, error) {
@@ -62,7 +61,7 @@ func loadTable(snap ddl.Snapshot, name, idColumn string) (*Table, error) {
 		}
 	}
 	if !hasID {
-		return nil, errors.New("dataimport: table " + name + " has no id column " + idColumn)
+		return nil, wfmt.Err("dataimport:", "table", name, "has no", "id column", idColumn, "— fix IDColumn in Plan.Tables")
 	}
 
 	t := &Table{Name: name, IDColumn: idColumn, Columns: cols}
@@ -84,7 +83,7 @@ func loadTable(snap ddl.Snapshot, name, idColumn string) (*Table, error) {
 			} else if b, ok := v.([]byte); ok {
 				cells[i] = cell{text: string(b), null: false}
 			} else {
-				return nil, errors.New("dataimport: table " + name + " column " + cols[i] + ": value is not text")
+				return nil, wfmt.Err("dataimport:", "table", name, "column", cols[i], "returned a value that is not text — the backup engine must return every value as text")
 			}
 		}
 		t.Rows = append(t.Rows, Row{values: cells})

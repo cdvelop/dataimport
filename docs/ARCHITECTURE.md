@@ -18,3 +18,4 @@ The primary flow involves reading a snapshot, validating steps, starting a singl
 - **One Transaction:** The entire run happens within a single transaction to ensure atomicity. If applying, it either fully succeeds or entirely fails.
 - **Dependencies:** Steps define their dependencies. The runner pulls the necessary dependencies, topologically sorting them for execution.
 - **Rehearsal is the Same Code:** Rehearsing runs the exact same code as applying, meaning real constraints and side-effects are properly evaluated before the transaction is forcefully rolled back.
+- **Messages:** every message is built with `webtyp.com/fmt.Err` and translated through `lang.json`; numbers and names are data.
