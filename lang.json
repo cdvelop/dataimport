@@ -1,7 +1,7 @@
 {
   "languages": ["es", "zh", "hi", "ar", "pt", "fr", "de", "ru"],
   "keys": {
-    "but the steps accounted for": ["pero los pasos rindieron cuentas de", "", "", "", "", "", "", ""],
+    "but the steps accounted for": ["pero los pasos solo contabilizaron", "", "", "", "", "", "", ""],
     "column": ["columna", "", "", "", "", "", "", ""],
     "created": ["creado", "", "", "", "", "", "", ""],
     "dataimport:": ["dataimport:", "", "", "", "", "", "", ""],
