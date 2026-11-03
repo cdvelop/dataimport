@@ -15,6 +15,9 @@ const (
 )
 
 // SourceTable declares a legacy table and its id column.
+// RuleBackupNotice marks a note that comes from the backup engine (ddl.Snapshot.Notices).
+const RuleBackupNotice = "backup_notice"
+
 type SourceTable struct{ Name, IDColumn string }
 
 type Step[T any] struct {
@@ -197,6 +200,10 @@ func Run[T any](db *orm.DB, snap ddl.Snapshot, fixes *Corrections, p Plan[T], se
 		return nil, err
 	}
 	rep := &Report{}
+	// What the engine tolerated while opening the backup reaches the person reading the report.
+	for _, n := range snap.Notices() {
+		rep.Note("", "", RuleBackupNotice, n.Error())
+	}
 	src := &source{snap: snap, tables: p.Tables, fixes: fixes, rep: rep}
 	txErr := db.Tx(func(tx *orm.DB) error {
 		mods, err := p.Build(tx)

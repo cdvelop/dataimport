@@ -14,6 +14,7 @@ type memTable struct {
 
 type memSnapshot struct {
 	tables []memTable
+	notices []error
 }
 
 func (s *memSnapshot) Tables() ([]string, error) {
@@ -47,6 +48,8 @@ func (s *memSnapshot) ReadTable(table string) (storage.Rows, error) {
 }
 
 func (s *memSnapshot) Close() error { return nil }
+
+func (s *memSnapshot) Notices() []error { return s.notices }
 
 type memRows struct {
 	cols []string

@@ -695,3 +695,22 @@ func TestWriteText(t *testing.T) {
 		t.Errorf("unexpected WriteText output: %s", out)
 	}
 }
+
+func TestBackupNoticeReachesReport(t *testing.T) {
+	snap := &memSnapshot{notices: []error{errors.New("the server skipped one setting; your data is complete")}}
+	dbPath := filepath.Join(t.TempDir(), "t.db")
+	conn, _ := sqlite.Open(dbPath)
+	db := orm.New(conn)
+	plan := dataimport.Plan[*orm.DB]{
+		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
+		Steps: []dataimport.Step[*orm.DB]{{Name: "noop", Run: func(dataimport.Session[*orm.DB]) error { return nil }}},
+	}
+	rep, err := dataimport.Run(db, snap, nil, plan, []string{"noop"}, dataimport.Rehearse)
+	if err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+	notes := rep.Notes()
+	if len(notes) != 1 || notes[0].Rule != dataimport.RuleBackupNotice || notes[0].Message != "the server skipped one setting; your data is complete" {
+		t.Fatalf("notes = %+v", notes)
+	}
+}

@@ -3,7 +3,7 @@ module webtyp.com/dataimport
 go 1.26.8
 
 require (
-	webtyp.com/ddl v0.0.40
+	webtyp.com/ddl v0.0.43
 	webtyp.com/orm v0.12.24
 	webtyp.com/sqlite v0.3.29
 	webtyp.com/storage v0.1.18
@@ -12,6 +12,8 @@ require (
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/mattn/go-isatty v0.0.23 // indirect
+	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/sys v0.47.0 // indirect
 	modernc.org/libc v1.74.1 // indirect
