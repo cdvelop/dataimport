@@ -3,8 +3,10 @@ PLAN: "feat: dataimport — import steps over a ddl.Snapshot, rehearse with roll
 TAG: v0.1.0
 EXECUTOR: jules
 REVIEWER: none
-STATUS: running
+STATUS: review
 SESSION: 16441366779111196737
+PR: https://github.com/cdvelop/dataimport/pull/1
+REVIEWED_COMMIT: 6aac4b3c42909d1bd9e188e7dc6e2be3cfb57d28
 ---
 
 > Read AGENTS.md at the repo root before any change.
