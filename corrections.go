@@ -2,14 +2,17 @@ package dataimport
 
 import (
 	"encoding/csv"
-	"errors"
 	"io"
+
+	wfmt "webtyp.com/fmt"
 )
 
 type Correction struct{ Table, ID, Field, Original, Corrected, Reason string }
 type Corrections struct{ list []Correction; applied []bool }
 
-var ErrCorrectionsHeader = errors.New("dataimport: corrections header must be tabla,id,campo,valor_original,valor_corregido,motivo")
+const correctionsHeader = "tabla,id,campo,valor_original,valor_corregido,motivo"
+
+var ErrCorrectionsHeader = wfmt.Err("dataimport:", "the corrections file must start with this header:", correctionsHeader)
 
 func ReadCorrections(r io.Reader) (*Corrections, error) {
 	cr := csv.NewReader(r)
@@ -64,12 +67,12 @@ func (c *Corrections) apply(t *Table, rep *Report) {
 				}
 
 				if !hasCol {
-					rep.Problem(Issue{Table: t.Name, SourceID: corr.ID, Field: corr.Field, Rule: "correction_target_missing"})
+					rep.Problem(Issue{Table: t.Name, SourceID: corr.ID, Field: corr.Field, Rule: "correction_target_missing", Message: wfmt.Err("this row or column is not in the backup — remove the correction or fix its id or campo").Error()})
 					break
 				}
 
 				if t.Value(r, corr.Field) != corr.Original {
-					rep.Problem(Issue{Table: t.Name, SourceID: corr.ID, Field: corr.Field, Rule: "correction_stale", Message: "current value " + t.Value(r, corr.Field)})
+					rep.Problem(Issue{Table: t.Name, SourceID: corr.ID, Field: corr.Field, Rule: "correction_stale", Message: wfmt.Err("the value in the backup is now", t.Value(r, corr.Field), "— update valor_original in the corrections file").Error()})
 					break
 				}
 
@@ -80,7 +83,7 @@ func (c *Corrections) apply(t *Table, rep *Report) {
 			}
 		}
 		if !found {
-			rep.Problem(Issue{Table: t.Name, SourceID: corr.ID, Field: corr.Field, Rule: "correction_target_missing"})
+			rep.Problem(Issue{Table: t.Name, SourceID: corr.ID, Field: corr.Field, Rule: "correction_target_missing", Message: wfmt.Err("this row or column is not in the backup — remove the correction or fix its id or campo").Error()})
 		}
 	}
 }

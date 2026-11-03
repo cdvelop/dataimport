@@ -3,6 +3,8 @@ package dataimport
 import (
 	"fmt"
 	"io"
+
+	wfmt "webtyp.com/fmt"
 )
 
 type Outcome int
@@ -113,8 +115,7 @@ func (r *Report) Problems() []Issue {
 func (r *Report) Balanced() error {
 	for _, c := range r.counts {
 		if c.Source != c.Imported+c.Merged+c.Discarded {
-			return fmt.Errorf("dataimport: table %s: %d source rows, %d accounted (imported %d, merged %d, discarded %d)",
-				c.Table, c.Source, c.Imported+c.Merged+c.Discarded, c.Imported, c.Merged, c.Discarded)
+			return wfmt.Err("dataimport:", "table", c.Table, "has", c.Source, "rows in the backup", "but the steps accounted for", c.Imported+c.Merged+c.Discarded, "(", "imported", c.Imported, "merged", c.Merged, "discarded", c.Discarded, ")", "— every row must be imported, merged or discarded, so nothing was saved")
 		}
 	}
 	return nil
@@ -123,13 +124,12 @@ func (r *Report) Balanced() error {
 // WriteText: counts table, derived lines, notes grouped by Rule (count + first 5 source ids), then problems.
 func (r *Report) WriteText(w io.Writer) error {
 	for _, c := range r.counts {
-		if _, err := fmt.Fprintf(w, "table %s: %d source rows, %d accounted (imported %d, merged %d, discarded %d)\n",
-			c.Table, c.Source, c.Imported+c.Merged+c.Discarded, c.Imported, c.Merged, c.Discarded); err != nil {
+		if _, err := io.WriteString(w, wfmt.Err("table", c.Table, ":", c.Source, "rows in the backup", "—", "imported", c.Imported, "merged", c.Merged, "discarded", c.Discarded).Error()+"\n"); err != nil {
 			return err
 		}
 	}
 	for _, d := range r.derived {
-		if _, err := fmt.Fprintf(w, "derived %s: %d\n", d.Target, d.N); err != nil {
+		if _, err := io.WriteString(w, wfmt.Err("created", d.Target, ":", d.N).Error()+"\n"); err != nil {
 			return err
 		}
 	}
@@ -144,7 +144,7 @@ func (r *Report) WriteText(w io.Writer) error {
 	}
 	for _, rule := range rules {
 		notes := notesByRule[rule]
-		if _, err := fmt.Fprintf(w, "note %s (%d): ", rule, len(notes)); err != nil {
+		if _, err := io.WriteString(w, wfmt.Err("note", rule, "(", len(notes), ")", ":").Error()+" "); err != nil {
 			return err
 		}
 		for i, n := range notes {
@@ -169,7 +169,7 @@ func (r *Report) WriteText(w io.Writer) error {
 	}
 
 	for _, p := range r.problems {
-		if _, err := fmt.Fprintf(w, "problem %s: %s\n", p.Rule, p.Message); err != nil {
+		if _, err := io.WriteString(w, wfmt.Err("problem", p.Rule, ":").Error()+" "+p.Message+"\n"); err != nil {
 			return err
 		}
 	}

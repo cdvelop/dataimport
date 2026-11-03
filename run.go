@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"webtyp.com/ddl"
+	wfmt "webtyp.com/fmt"
 	"webtyp.com/orm"
 )
 
@@ -145,11 +146,11 @@ func (p Plan[T]) StepNames() ([]string, error) {
 }
 
 var (
-	ErrRolledBack   = errors.New("dataimport: rolled back")
-	ErrUnknownStep  = errors.New("dataimport: unknown step")
-	ErrStepCycle    = errors.New("dataimport: steps form a cycle")
-	ErrOwnedTwice   = errors.New("dataimport: table owned by two steps")
-	ErrNoneSelected = errors.New("dataimport: no step selected")
+	ErrRolledBack   = wfmt.Err("dataimport:", "nothing was saved: the import was rolled back")
+	ErrUnknownStep  = wfmt.Err("dataimport:", "this step does not exist in the plan — check the name you selected")
+	ErrStepCycle    = wfmt.Err("dataimport:", "two or more steps wait for each other (After), so none can start — remove one of the After links")
+	ErrOwnedTwice   = wfmt.Err("dataimport:", "two steps own the same table — a table is reconciled by only one step")
+	ErrNoneSelected = wfmt.Err("dataimport:", "no step was selected — choose at least one")
 )
 
 type source struct {
@@ -214,12 +215,12 @@ func Run[T any](db *orm.DB, snap ddl.Snapshot, fixes *Corrections, p Plan[T], se
 			for _, owned := range st.Owns {
 				t, err := src.table(owned)
 				if err != nil {
-					return fmt.Errorf("step %s: %w", st.Name, err)
+					return fmt.Errorf("%s %s: %w", wfmt.Err("step").Error(), st.Name, err)
 				}
 				rep.setSource(owned, len(t.Rows))
 			}
 			if err := st.Run(Session[T]{Report: rep, Modules: mods, source: src}); err != nil {
-				return fmt.Errorf("step %s: %w", st.Name, err)
+				return fmt.Errorf("%s %s: %w", wfmt.Err("step").Error(), st.Name, err)
 			}
 		}
 		if mode == Rehearse || len(rep.Problems()) > 0 || rep.Balanced() != nil {

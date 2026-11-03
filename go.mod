@@ -4,6 +4,7 @@ go 1.26.8
 
 require (
 	webtyp.com/ddl v0.0.43
+	webtyp.com/fmt v1.0.0
 	webtyp.com/orm v0.12.24
 	webtyp.com/sqlite v0.3.29
 	webtyp.com/storage v0.1.18
@@ -20,7 +21,6 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.54.0 // indirect
-	webtyp.com/fmt v1.0.0 // indirect
 	webtyp.com/model v0.2.12 // indirect
 	webtyp.com/sqlt v0.0.11 // indirect
 )

@@ -10,6 +10,7 @@ An app that replaces a legacy system must bring its data, repeatedly (rehearsals
 3. Rehearse (always roll back) or Apply (commit only with zero problems and a balanced report).
 4. Reconcile: per legacy table owned by a step, rows = imported + merged + discarded.
 5. Correct: apply an exact corrections CSV before the steps read a table.
+6. Messages: every message is built with `webtyp.com/fmt.Err` and translated through `lang.json`; numbers and names are data.
 
 ## Before You Start
 
