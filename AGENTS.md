@@ -28,7 +28,7 @@ Engine-neutral import of a legacy system's data into a webtyp app. It reads the 
 `orm.DB` transaction. Domain mapping (which legacy column becomes which field) belongs to the consuming app,
 never here.
 
-- Server-side library; uses stdlib `database/sql` (`sql.NullString`), `errors`, `sort`, `strings`: legitimate here,
+- Server-side library; uses stdlib `errors`, `sort`, `strings`: legitimate here,
   do NOT replace them with webtyp equivalents.
 - No `map` in the public API: slices, deterministic order.
 - Tests in `tests/` against `webtyp.com/sqlite` in memory (real transactions; `storage/mem` commits nothing and
