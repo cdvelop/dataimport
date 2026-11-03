@@ -3,6 +3,8 @@ PLAN: "feat: dataimport — import steps over a ddl.Snapshot, rehearse with roll
 TAG: v0.1.0
 EXECUTOR: jules
 REVIEWER: none
+STATUS: running
+SESSION: 16441366779111196737
 ---
 
 > Read AGENTS.md at the repo root before any change.
