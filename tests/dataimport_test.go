@@ -54,7 +54,7 @@ func TestValueAndNull(t *testing.T) {
 	}
 	db := setupDB(t)
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{
@@ -99,7 +99,7 @@ func TestValueUnknownColumnPanics(t *testing.T) {
 	}
 	db := setupDB(t)
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{
@@ -154,7 +154,7 @@ func TestRehearseLeavesNoRows(t *testing.T) {
 	db := orm.New(conn)
 
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{
@@ -207,7 +207,7 @@ func TestNonTextValueRejected(t *testing.T) {
 	}
 	db := setupDB(t)
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{
@@ -248,7 +248,7 @@ func TestApplyCommits(t *testing.T) {
 	db := orm.New(conn)
 
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{
@@ -303,7 +303,7 @@ func TestApplyWithProblemRollsBack(t *testing.T) {
 	db := orm.New(conn)
 
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{
@@ -360,7 +360,7 @@ func TestApplyUnbalancedRollsBack(t *testing.T) {
 	db := orm.New(conn)
 
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{
@@ -414,7 +414,7 @@ func TestStepErrorRollsBack(t *testing.T) {
 	db := orm.New(conn)
 
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{
@@ -554,7 +554,7 @@ func TestCorrectionApplied(t *testing.T) {
 	db := orm.New(conn)
 
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{
@@ -600,7 +600,7 @@ func TestCorrectionStale(t *testing.T) {
 	db := orm.New(conn)
 
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{Name: "widgets", Owns: []string{"legacy_widget"}, Run: func(s dataimport.Session[*orm.DB]) error { s.Table("legacy_widget"); return nil }},
@@ -635,7 +635,7 @@ func TestCorrectionTargetMissing(t *testing.T) {
 	db := orm.New(conn)
 
 	plan := dataimport.Plan[*orm.DB]{
-		Tables: []dataimport.SourceTable{{"legacy_widget", "id"}},
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
 		Build: func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
 		Steps: []dataimport.Step[*orm.DB]{
 			{Name: "widgets", Owns: []string{"legacy_widget"}, Run: func(s dataimport.Session[*orm.DB]) error { s.Table("legacy_widget"); return nil }},

@@ -1,4 +1,5 @@
 # dataimport
+<img src="docs/img/badges.svg">
 
 ## Why This Exists
 
