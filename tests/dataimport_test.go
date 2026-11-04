@@ -714,3 +714,19 @@ func TestBackupNoticeReachesReport(t *testing.T) {
 		t.Fatalf("notes = %+v", notes)
 	}
 }
+
+func TestWriteTextShowsNoteMessages(t *testing.T) {
+	rep := &dataimport.Report{}
+	rep.Note("", "", dataimport.RuleBackupNotice, "the server skipped one setting")
+	rep.Note("staff", "7", "staff_ip_unknown", "10.0.0.9")
+	rep.Problem(dataimport.Issue{Table: "staff", SourceID: "8", Rule: "staff_rut_invalid", Message: "123"})
+	var b strings.Builder
+	if err := rep.WriteText(&b); err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"the server skipped one setting", "7 (10.0.0.9)", "staff 8: 123"} {
+		if !strings.Contains(b.String(), want) {
+			t.Errorf("report misses %q:\n%s", want, b.String())
+		}
+	}
+}

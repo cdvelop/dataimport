@@ -159,7 +159,15 @@ func (r *Report) WriteText(w io.Writer) error {
 					return err
 				}
 			}
-			if _, err := fmt.Fprint(w, n.SourceID); err != nil {
+			// Each note shows its id and its data; a note with no id (a backup notice) shows only its message.
+			item := n.SourceID
+			switch {
+			case item == "":
+				item = n.Message
+			case n.Message != "":
+				item += " (" + n.Message + ")"
+			}
+			if _, err := fmt.Fprint(w, item); err != nil {
 				return err
 			}
 		}
@@ -169,10 +177,18 @@ func (r *Report) WriteText(w io.Writer) error {
 	}
 
 	for _, p := range r.problems {
-		if _, err := io.WriteString(w, wfmt.Err("problem", p.Rule, ":").Error()+" "+p.Message+"\n"); err != nil {
+		if _, err := io.WriteString(w, wfmt.Err("problem", p.Rule, ":").Error()+" "+problemWhere(p)+p.Message+"\n"); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+// problemWhere names the legacy row of a problem ("staff 123: "), so the person knows which row to fix.
+func problemWhere(p Issue) string {
+	if p.SourceID == "" {
+		return ""
+	}
+	return p.Table + " " + p.SourceID + ": "
 }
