@@ -730,3 +730,44 @@ func TestWriteTextShowsNoteMessages(t *testing.T) {
 		}
 	}
 }
+
+// A step tells a value the owner confirmed in the corrections file from one read from the backup — also when the
+// correction keeps the same value (the owner confirmed it as it is).
+func TestCorrectionMarksTheCell(t *testing.T) {
+	snap := &memSnapshot{tables: []memTable{{
+		name: "legacy_widget",
+		cols: []string{"id", "name", "code"},
+		rows: [][]*any{{anyPtr("1"), anyPtr("Ana"), anyPtr("A1")}, {anyPtr("2"), anyPtr("Beto"), anyPtr("B2")}},
+	}}}
+	fixes, err := dataimport.ReadCorrections(strings.NewReader("tabla,id,campo,valor_original,valor_corregido,motivo\nlegacy_widget,1,code,A1,A1,confirmed as it is"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	conn, _ := sqlite.Open(filepath.Join(t.TempDir(), "t.db"))
+	plan := dataimport.Plan[*orm.DB]{
+		Tables: []dataimport.SourceTable{{Name: "legacy_widget", IDColumn: "id"}},
+		Build:  func(tx *orm.DB) (*orm.DB, error) { return tx, nil },
+		Steps: []dataimport.Step[*orm.DB]{{Name: "widgets", Owns: []string{"legacy_widget"}, Run: func(s dataimport.Session[*orm.DB]) error {
+			tb, _ := s.Table("legacy_widget")
+			if !tb.Corrected(tb.Rows[0], "code") {
+				t.Error("row 1 code: expected Corrected true")
+			}
+			if tb.Corrected(tb.Rows[0], "name") || tb.Corrected(tb.Rows[1], "code") {
+				t.Error("a cell without a correction reports Corrected true")
+			}
+			return nil
+		}}},
+	}
+	if _, err := dataimport.Run(orm.New(conn), snap, fixes, plan, []string{"widgets"}, dataimport.Rehearse); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// A malformed corrections file stops the import naming the problem; it never reads as "no corrections".
+func TestCorrectionsMalformedCSV(t *testing.T) {
+	csvData := "tabla,id,campo,valor_original,valor_corregido,motivo\npatient,1,patient_run,\"8294,8294729-9,unclosed quote"
+	_, err := dataimport.ReadCorrections(strings.NewReader(csvData))
+	if !errors.Is(err, dataimport.ErrCorrectionsFormat) {
+		t.Errorf("expected ErrCorrectionsFormat, got %v", err)
+	}
+}

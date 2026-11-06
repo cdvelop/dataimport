@@ -2,6 +2,7 @@ package dataimport
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 
 	wfmt "webtyp.com/fmt"
@@ -12,13 +13,17 @@ type Corrections struct{ list []Correction; applied []bool }
 
 const correctionsHeader = "tabla,id,campo,valor_original,valor_corregido,motivo"
 
+// ErrCorrectionsFormat: the file is not valid CSV (an unclosed quote, a row with another number of columns); the
+// error says the line. Never read as "no corrections": the import would run without the owner's decisions.
+var ErrCorrectionsFormat = wfmt.Err("dataimport:", "the corrections file is not valid CSV")
+
 var ErrCorrectionsHeader = wfmt.Err("dataimport:", "the corrections file must start with this header:", correctionsHeader)
 
 func ReadCorrections(r io.Reader) (*Corrections, error) {
 	cr := csv.NewReader(r)
 	records, err := cr.ReadAll()
 	if err != nil {
-		return &Corrections{}, nil
+		return nil, fmt.Errorf("%w: %v", ErrCorrectionsFormat, err)
 	}
 	if len(records) == 0 {
 		return &Corrections{}, nil

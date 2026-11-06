@@ -13,7 +13,7 @@ type Table struct {
 	Rows     []Row
 }
 
-type cell struct{ text string; null bool }
+type cell struct{ text string; null, corrected bool }
 type Row struct{ values []cell }
 
 // Value returns the column's text, "" for NULL. An unknown column is a mapping bug: it panics with
@@ -24,6 +24,12 @@ func (t *Table) Value(r Row, col string) string { return r.values[t.index(col)].
 
 // IsNull reports whether the column is NULL in r.
 func (t *Table) IsNull(r Row, col string) bool { return r.values[t.index(col)].null }
+
+// Corrected reports whether the corrections file set this cell — also with the same value it had, which is how
+// an owner confirms a value as it is.
+//
+// Example: if staff.Corrected(row, "staff_password") { … the owner already decided this one … }
+func (t *Table) Corrected(r Row, col string) bool { return r.values[t.index(col)].corrected }
 
 // ID returns the row's legacy id (IDColumn).
 func (t *Table) ID(r Row) string { return t.Value(r, t.IDColumn) }
@@ -37,7 +43,7 @@ func (t *Table) index(col string) int {
 	panic(wfmt.Err("dataimport:", "table", t.Name, "has no", "column", col, "— check the column name in your step").Error())
 }
 
-func (t *Table) set(r Row, col, value string) { r.values[t.index(col)] = cell{text: value, null: false} }
+func (t *Table) set(r Row, col, value string) { r.values[t.index(col)] = cell{text: value, corrected: true} }
 
 var ErrTableNotDeclared = wfmt.Err("dataimport:", "the step reads a table that is not listed in Plan.Tables — add it there with its", "id column")
 
