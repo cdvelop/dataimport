@@ -3,7 +3,7 @@ module webtyp.com/dataimport
 go 1.26.8
 
 require (
-	webtyp.com/ddl v0.0.45
+	webtyp.com/ddl v0.0.46
 	webtyp.com/fmt v1.0.0
 	webtyp.com/orm v0.12.25
 	webtyp.com/sqlite v0.3.29
